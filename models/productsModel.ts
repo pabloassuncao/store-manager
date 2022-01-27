@@ -51,10 +51,20 @@ async function update({id, name, quantity}: Product) {
   return result;
 }
 
+async function deleteById(id: number) {
+  const sql = `DELETE FROM products WHERE id = ?`;
+  const values = [id];
+
+  await connection.query(sql, values);
+
+  return;
+}
+
 export default {
   listAll,
   findById,
   create,
   findByName,
   update,
+  deleteById,
 }

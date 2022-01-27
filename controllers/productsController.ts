@@ -44,11 +44,18 @@ async function updateProduct(req: Request, res: Response) {
   return res.status(utils.HTTP_OK_STATUS).json(result).end();
 }
 
+async function deleteProductById(req: Request, res: Response) {
+  const { id } = req.params;
+  const result = await productsService.deleteById(+id);
+  return res.status(utils.HTTP_OK_STATUS).json(result).end();
+}
+
 const router: Router = Router();
 
 router.get('/:id', rescue(findProductById));
 router.get('/', rescue(listAllProducts));
 router.put('/:id', rescue(updateProduct))
 router.post('/', rescue(createProduct));
+router.delete('/:id', rescue(deleteProductById));
 
 export default router;

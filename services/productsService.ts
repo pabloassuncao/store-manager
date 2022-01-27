@@ -53,10 +53,19 @@ async function update({id, name, quantity}: Product) {
   return {id, name, quantity};
 }
 
+async function deleteById(id: number) {
+  const deletedProduct: Product = await findById(id);
+
+  await productsModel.deleteById(id);
+
+  return deletedProduct;
+}
+
 
 export default {
   create,
   listAll,
   findById,
   update,
+  deleteById,
 }
