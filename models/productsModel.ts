@@ -1,9 +1,9 @@
 import connection from '../controllers/connection';
-import { Product } from '../controllers/utils';
+import { Product, ProductInfo } from '../controllers/utils';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: __dirname+'/.env' });
 
-async function create({name, quantity}: Product) {
+async function create({name, quantity}: ProductInfo) {
   const sql = `INSERT INTO products (name, quantity) VALUES (?, ?)`;
   const values = [name, quantity];
   
@@ -41,9 +41,20 @@ async function findById(id: number) {
   return result[0];
 }
 
+async function update({id, name, quantity}: Product) {
+  const sql = `UPDATE products SET name = ?, quantity = ? WHERE id = ?`;
+  const values = [name, quantity, id];
+
+  const [product] = await connection.query(sql, values);
+  const result: any = product
+
+  return result;
+}
+
 export default {
   listAll,
   findById,
   create,
   findByName,
+  update,
 }

@@ -1,6 +1,11 @@
 // Types
 export interface Product {
-  id?: number;
+  id: number;
+  name: string;
+  quantity: number;
+}
+
+export interface ProductInfo {
   name: string;
   quantity: number;
 }
