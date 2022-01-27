@@ -13,6 +13,7 @@ export interface Err {
 // PATH
 
 // Messages
+const PRODUCT_NOT_FOUND = 'Product not found';
 const PRODUCT_NAME_NOT_FOUND = '"name" is required';
 const PRODUCT_NAME_INVALID = '"name" length must be at least 5 characters long'
 const PRODUCT_NAME_ALREADY_EXISTS = 'Product already exists';
@@ -61,6 +62,7 @@ export default {
   HTTP_INTERNAL_SERVER_ERROR_STATUS,
   PRODUCTS_ROUTE,
   PORT,
+  PRODUCT_NOT_FOUND,
   PRODUCT_NAME_NOT_FOUND,
   PRODUCT_NAME_INVALID,
   PRODUCT_NAME_ALREADY_EXISTS,

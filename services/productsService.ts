@@ -1,18 +1,14 @@
 import productsModel from "../models/productsModel";
-import utils from "../controllers/utils";
+import utils, { Product } from "../controllers/utils";
 
 async function create({name, quantity}: {name: string, quantity: number}) {
-  const product = await productsModel.findByName(name);
-  const test: any = product;
+  const product: Product = await productsModel.findByName(name);
 
-  if(test.length > 0) {
-    console.log('products already exists', product);
+  if(product) {
     throw { code: 'CONFLICT', message: utils.PRODUCT_NAME_ALREADY_EXISTS }
   }
   
   if(name.length < 5) {
-    console.log('invalid name');
-    
     throw { code: 'UNPROCCESSABLE_ENTITY', message: utils.PRODUCT_NAME_INVALID }
   }
 
@@ -20,12 +16,28 @@ async function create({name, quantity}: {name: string, quantity: number}) {
     throw { code: 'UNPROCCESSABLE_ENTITY', message: utils.PRODUCT_QUANTITY_INVALID }
   }
 
-  const [prod] = await productsModel.create({name, quantity});
-  const test2: any = prod;
+  const resultId = await productsModel.create({name, quantity});
 
-  return { id: test2.insertId, name, quantity };
+  return { id: resultId.insertId, name, quantity };
+}
+
+async function listAll() {
+  const products = await productsModel.listAll();
+  return products;
+}
+
+async function findById(id: number) {
+  const product: Product = await productsModel.findById(id);
+
+  if(!product) {
+    throw { code: 'NOT_FOUND', message: utils.PRODUCT_NOT_FOUND }
+  }
+
+  return product;
 }
 
 export default {
   create,
+  listAll,
+  findById,
 }
