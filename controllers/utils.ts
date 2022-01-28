@@ -42,6 +42,8 @@ const PRODUCT_QUANTITY_NOT_FOUND = '"quantity" is required';
 const PRODUCT_QUANTITY_INVALID = '"quantity" must be a number larger than or equal to 1'
 const SALE_PRODUCT_ID_NOT_FOUND = '"product_id" is required';
 const SALE_PRODUCT_ID_INVALID = '"product_id" must be a number';
+const SALE_NOT_FOUND = 'Sale not found';
+const SALE_PRODUCT_QUANTITY_ERROR = 'Such amount is not permitted to sell';
 
 // HTTP response status codes
 const HTTP_OK_STATUS = 200;
@@ -101,4 +103,6 @@ export default {
   ERR_CODES,
   SALE_PRODUCT_ID_INVALID,
   SALE_PRODUCT_ID_NOT_FOUND,
+  SALE_PRODUCT_QUANTITY_ERROR,
+  SALE_NOT_FOUND,
 }
