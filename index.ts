@@ -5,6 +5,7 @@ dotenv.config({ path: __dirname+'/.env' });
 
 import productsController from './controllers/productsController';
 import utils, { Err } from './controllers/utils';
+import saleController from './controllers/saleController';
 
 const app: Application = express();
 app.use(bodyParser.json());
@@ -15,6 +16,8 @@ app.get('/', (_request: Request, response: Response): void => {
 });
 
 app.use(utils.PRODUCTS_ROUTE, productsController)
+
+app.use(utils.SALES_ROUTE, saleController)
 
 app.use((err: Err, __req: Request, res: Response, __next: NextFunction) => {
   const status = utils.ERR_CODES[err.code];

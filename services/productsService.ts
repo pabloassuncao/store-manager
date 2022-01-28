@@ -1,19 +1,24 @@
 import productsModel from "../models/productsModel";
+import { productSchema } from "../schemas/productSchema";
 import utils, { Product, ProductInfo } from "../controllers/utils";
 
-async function create({name, quantity}: {name: string, quantity: number}) {
+async function validateReqProduct({name, quantity}: ProductInfo) {
+  const prodInfo: ProductInfo = { name, quantity };
+  
+  const {error} = await productSchema
+    .validate(prodInfo);
+  
+  if(error) {
+    throw { code: error.details[0].type, message: error.details[0].message };
+  }
+  return;
+}
+
+async function create({name, quantity}: ProductInfo) {
   const product: Product = await productsModel.findByName(name);
 
   if(product) {
     throw { code: 'CONFLICT', message: utils.PRODUCT_NAME_ALREADY_EXISTS }
-  }
-  
-  if(name.length < 5) {
-    throw { code: 'UNPROCCESSABLE_ENTITY', message: utils.PRODUCT_NAME_INVALID }
-  }
-
-  if(typeof quantity !== 'number' || Number(quantity) <= 0 || !Number(quantity)) {
-    throw { code: 'UNPROCCESSABLE_ENTITY', message: utils.PRODUCT_QUANTITY_INVALID }
   }
 
   const resultId = await productsModel.create({name, quantity});
@@ -28,7 +33,6 @@ async function listAll() {
 
 async function findById(id: number) {
   const product: Product = await productsModel.findById(id);
-  console.log(product);
   
   if(!product) {
     throw { code: 'NOT_FOUND', message: utils.PRODUCT_NOT_FOUND }
@@ -39,14 +43,6 @@ async function findById(id: number) {
 
 async function update({id, name, quantity}: Product) {
   await findById(id);
-
-  if(name && name.length < 5) {
-    throw { code: 'UNPROCCESSABLE_ENTITY', message: utils.PRODUCT_NAME_INVALID }
-  }
-
-  if(typeof quantity !== 'number' || Number(quantity) <= 0 || !Number(quantity)) {
-    throw { code: 'UNPROCCESSABLE_ENTITY', message: utils.PRODUCT_QUANTITY_INVALID }
-  }
 
   await productsModel.update({id, name, quantity});
 
@@ -68,4 +64,5 @@ export default {
   findById,
   update,
   deleteById,
+  validateReqProduct,
 }
