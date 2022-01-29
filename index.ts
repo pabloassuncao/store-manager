@@ -21,7 +21,6 @@ app.use(utils.SALES_ROUTE, saleController)
 
 app.use((err: Err, __req: Request, res: Response, __next: NextFunction) => {
   const status = utils.ERR_CODES[err.code];
-  console.log('entrou no erro');
   console.log(err);
 
   if (status) {

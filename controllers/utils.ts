@@ -26,6 +26,12 @@ export interface SaleReqInfo {
   quantity: number;
 }
 
+export interface SaleFindResponse {
+  date: Date;
+  "product_id": number;
+  quantity: number;
+}
+
 export interface Err {
   code: keyof typeof ERR_CODES;
   message: string;

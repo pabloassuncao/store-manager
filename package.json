@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --runInBand",
     "test:mocha": "nyc --all --include models --include services --include controllers mocha test/unit/*.js --exit",
-    "start": "nodemon index.ts",
+    "start": "ts-node index.ts",
     "debug": "nodemon index.ts",
     "lint": "eslint --no-inline-config --no-error-on-unmatched-pattern -c .eslintrc.json . --ext .js, .jsx"
   },
@@ -29,7 +29,9 @@
     "frisby": "^2.1.2",
     "jest": "^26.4.1",
     "joi": "^17.6.0",
-    "mysql2": "^2.3.0"
+    "mysql2": "^2.3.0",
+    "ts-node": "^10.4.0",
+    "ts-node-dev": "^1.1.8"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

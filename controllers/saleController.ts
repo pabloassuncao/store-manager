@@ -29,11 +29,25 @@ async function listAllSales(__req: Request, res: Response) {
   res.status(utils.HTTP_OK_STATUS).json(result);
 }
 
+async function updateSale(req: Request, res: Response) {
+  const id = req.params.id;
+  const sale = req.body;
+  const result = await saleProductService.updateSale(+id, sale);
+  res.status(utils.HTTP_OK_STATUS).json(result);
+}
+
+async function deleteSaleById(req: Request, res: Response) {
+  const id = req.params.id;
+  const result = await saleProductService.deleteSale(+id);
+  res.status(utils.HTTP_OK_STATUS).json(result);
+}
+
 const router: Router = Router();
 
 export default router
   .post('/', rescue(validateSale), rescue(createSale))
   .get('/:id', rescue(findSaleById))
   .get('/', rescue(listAllSales))
+  .put('/:id', rescue(validateSale), rescue(updateSale))
+  .delete('/:id', rescue(deleteSaleById))
   // .put('/:id', rescue(validateSale), rescue(updateSale))
-  // .delete('/:id', rescue(deleteSaleById))

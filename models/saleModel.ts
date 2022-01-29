@@ -15,9 +15,9 @@ async function newSale() {
 async function create(sales: Sale[][]) {
   const sql = `
   INSERT INTO sales_products (sale_id, product_id, quantity) VALUES ?`;
-  const values = sales;
+  const values = [sales];
   
-  const [sale] = await connection.query(sql, [values]);
+  const [sale] = await connection.query(sql, values);
   const result: any = sale;
   
   return result;
@@ -47,9 +47,9 @@ async function findById(saleId: number) {
   return result;
 }
 
-async function update({saleId, productId, quantity}: Sale) {
-  const sql = `UPDATE sale_products SET product_id = ?, quantity = ? WHERE sale_id = ?`;
-  const values = [productId, quantity, saleId];
+async function update(salesToUpdate: number[]) {
+  const sql = `UPDATE sales_products SET quantity = ? WHERE sale_id = ? AND product_id = ?`;
+  const values = salesToUpdate;
 
   const [product] = await connection.query(sql, values);
   const result: any = product
@@ -58,10 +58,13 @@ async function update({saleId, productId, quantity}: Sale) {
 }
 
 async function deleteById(id: number) {
-  const sql = `DELETE FROM sales WHERE id = ?`;
+  const sql1 = `DELETE FROM sales WHERE id = ?`;
+  const sql2 = `DELETE FROM sales_products WHERE sale_id = ?`;
+
   const values = [id];
 
-  await connection.query(sql, values);
+  await connection.query(sql1, values);
+  await connection.query(sql2, values);
 
   return;
 }
