@@ -1,22 +1,22 @@
+import { ParamsDictionary } from "express-serve-static-core";
+import { FieldPacket, ResultSetHeader, RowDataPacket } from "mysql2";
+
 // Types
-export interface Product {
-  id: number;
+export interface Product extends RowDataPacket {
+  id?: number;
   name: string;
   quantity: number;
 }
 
-export interface ProductInfo {
-  name: string;
-  quantity: number;
+export interface Req extends ParamsDictionary {
+  body: string;
 }
+
+export type InsertProductResult = [ResultSetHeader, FieldPacket[]];
+export type SelectProductResult = [Product[], FieldPacket[]];
 
 export interface Sale {
-  saleId: number;
-  productId: number;
-  quantity: number;
-}
-
-export interface SaleInfo {
+  saleId?: number;
   productId: number;
   quantity: number;
 }

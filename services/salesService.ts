@@ -1,9 +1,9 @@
 import saleModel from "../models/saleModel";
 import { saleSchema } from "../schemas/saleSchema";
-import utils, { Sale, SaleInfo, SaleReqInfo } from "../controllers/utils";
+import utils, { Sale, SaleReqInfo } from "../controllers/utils";
 
-async function salesConverter(sales: SaleReqInfo[]) { 
-  const salesParsed = sales.map((sale) => ({
+function salesConverter(sales: SaleReqInfo[]) { 
+  const salesParsed: Sale[] = sales.map((sale: SaleReqInfo): Sale => ({
     productId: sale['product_id'],
     quantity: sale['quantity'],
   }));
@@ -12,8 +12,8 @@ async function salesConverter(sales: SaleReqInfo[]) {
 }
 
 async function validateReqSale(salesRaw: SaleReqInfo[]) {
-  const sales = await salesConverter(salesRaw);
-  const errors = sales.map(async (sale: SaleInfo) => {
+  const sales = salesConverter(salesRaw);
+  const errors = sales.map(async (sale: Sale) => {
     const { error } = await saleSchema.validate(sale);
 
     if (error) {
@@ -50,27 +50,25 @@ async function findById(id: number) {
   return result;
 }
 
-async function create(sales: Sale[][]) {
-  const result = await saleModel.create(sales);
-
-  return result;
+async function create(sales: number[][]) {
+  await saleModel.create(sales);
+  return;
 }
 
-async function update(sales: number[][]) {
-  const result = sales.map(async (sale: number[]) => {
-    await saleModel.update(sale);
+async function update(sales: Sale[]) {
+  const result = sales.map(async (sale: Sale) => {
+    if (sale.saleId) {
+      await saleModel.update([sale.quantity, sale.saleId, sale.productId]);
+    }
     return sale;
   });
 
   await Promise.all(result);
-
-  return result;
 }
 
 async function deleteById(id: number) {
-  const result = await saleModel.deleteById(id);
-
-  return result;
+  await saleModel.deleteById(id);
+  return;
 }
 
 export default {

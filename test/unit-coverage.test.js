@@ -1,3 +1,4 @@
+const { fileURLToPath } = require('url');
 const fs = require('fs').promises;
 const util = require('util');
 const { exec: callbackExec } = require('child_process');
@@ -8,8 +9,8 @@ require('dotenv').config();
 
 const exec = util.promisify(callbackExec);
 
-const NPX_NYC_COMMAND =
-  `npx nyc --all --include services --include models --include controllers --reporter json-summary mocha test/unit/services.js test/unit/models.js test/unit/controllers.js --exit`;
+let NPX_NYC_COMMAND =
+`npx nyc --all --include services --include models --include controllers --reporter json-summary mocha test/unit/services.js test/unit/models.js test/unit/controllers.js --exit`;
 
 function readCoverageFile() {
   const COVERAGE_FILE_PATH = path.join(__dirname, '..', 'coverage', 'coverage-summary.json');
@@ -20,11 +21,19 @@ const executeTests = async () => {
   try {
     await exec(NPX_NYC_COMMAND)
   } catch (error) {
-    throw 'Algum dos seus testes falhou, esse requisito só será avaliado se todos os testes passarem';
+    throw error;
   }
 };
 
 describe('Testes das camadas Model, Service e Controller', () => {
+  beforeAll(async() => {
+    const files = await fs.readdir(path.join(__dirname + '/unit'));
+    if(files.some((file) => (file.endsWith('.ts')))) {
+      NPX_NYC_COMMAND = NPX_NYC_COMMAND.replace('test/unit/services.js test/unit/models.js test/unit/controllers.js', '-r ts-node/register test/unit/services.ts test/unit/models.ts test/unit/controllers.ts');
+      // NPX_NYC_COMMAND = `nyc --all --include models --include services --include controllers --reporter json-summary mocha -r ts-node/register test/unit/services.ts test/unit/models.ts test/unit/controllers.ts --exit`;
+    }
+  });
+
   beforeEach(async() => {
     await executeTests();
   })

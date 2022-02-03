@@ -1,26 +1,24 @@
 import connection from '../controllers/connection';
-import { Sale, SaleInfo } from '../controllers/utils';
+import { Sale } from '../controllers/utils';
 import * as dotenv from 'dotenv';
+import { ResultSetHeader } from 'mysql2';
 dotenv.config({ path: __dirname+'/.env' });
 
 async function newSale() {
   const sql = `INSERT INTO sales (id) VALUES (DEFAULT)`
-  const [sale] = await connection.query(sql);
-  
-  const result: any = sale
+  const [sale] = await connection.query<ResultSetHeader>(sql);
 
-  return result;
+  return sale.insertId;
 }
 
-async function create(sales: Sale[][]) {
+async function create(sales: number[][]) {
   const sql = `
   INSERT INTO sales_products (sale_id, product_id, quantity) VALUES ?`;
   const values = [sales];
   
-  const [sale] = await connection.query(sql, values);
-  const result: any = sale;
+  await connection.query(sql, values);
   
-  return result;
+  return;
 }
 
 async function listAll() {
@@ -48,13 +46,13 @@ async function findById(saleId: number) {
 }
 
 async function update(salesToUpdate: number[]) {
-  const sql = `UPDATE sales_products SET quantity = ? WHERE sale_id = ? AND product_id = ?`;
+  const sql = `UPDATE
+  sales_products SET quantity = ? WHERE sale_id = ? AND product_id = ?`;
   const values = salesToUpdate;
+  
+  const result = await connection.query(sql, values);
 
-  const [product] = await connection.query(sql, values);
-  const result: any = product
-
-  return result;
+  return;
 }
 
 async function deleteById(id: number) {

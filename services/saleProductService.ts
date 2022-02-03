@@ -1,18 +1,14 @@
 import salesService from "./salesService";
 import productsService from "./productsService";
-import utils, { Product, Sale, SaleFindResponse, SaleInfo, SaleReqInfo } from "../controllers/utils";
+import utils, { Product, Sale, SaleFindResponse, SaleReqInfo } from "../controllers/utils";
 
-async function productsQuantityUpdate(sales: SaleInfo[]) {
-  const productsUpdate = sales.map(async ({productId, quantity}: SaleInfo) => {
+async function productsQuantityUpdate(sales: Sale[]) {
+  const productsUpdate = sales.map(async ({productId, quantity}: Sale) => {
     const product: Product = await productsService.findById(productId);
 
-    const newQuantity = product.quantity - quantity;
+    product.quantity -= quantity;
 
-    const result = await productsService.update({
-      id: productId,
-      name: product.name,
-      quantity: newQuantity,
-    });
+    const result = await productsService.update(product);
 
     return result;
   });
@@ -24,18 +20,14 @@ async function productsQuantityUpdate(sales: SaleInfo[]) {
 
 async function revertNewSaleProductUpdate(id: number) {
   const saleToUpdateRaw: SaleFindResponse[] = await salesService.findById(id);
-  const salesToUpdate: SaleInfo[] = await salesService.salesConverter(saleToUpdateRaw);
+  const salesToUpdate: Sale[] = await salesService.salesConverter(saleToUpdateRaw);
 
-  const productsUpdate = salesToUpdate.map(async ({productId, quantity}: SaleInfo) => {
-    const product: Product = await productsService.findById(productId);
+  const productsUpdate = salesToUpdate.map(async (sale: Sale) => {
+    const product: Product = await productsService.findById(sale.productId);
+    
+    product.quantity += sale.quantity;
 
-    const newQuantity = product.quantity + quantity;
-
-    const result = await productsService.update({
-      id: productId,
-      name: product.name,
-      quantity: newQuantity,
-    });
+    const result = await productsService.update(product);
 
     return result;
   });
@@ -45,8 +37,8 @@ async function revertNewSaleProductUpdate(id: number) {
   return;
 }
 
-async function salesChecker(sales: SaleInfo[]) {
-  const result = sales.map(async (sale: SaleInfo) => {
+async function salesChecker(sales: Sale[]) {
+  const result = sales.map(async (sale: Sale) => {
     const product: Product = await productsService.findById(sale.productId);
 
     if(product.quantity < sale.quantity) {
@@ -62,7 +54,7 @@ async function salesChecker(sales: SaleInfo[]) {
 }
 
 async function createSale(salesRaw: SaleReqInfo[]) {
-  const sales: SaleInfo[] = await salesService.salesConverter(salesRaw);
+  const sales: Sale[] = await salesService.salesConverter(salesRaw);
 
   await salesChecker(sales);
   
@@ -70,13 +62,13 @@ async function createSale(salesRaw: SaleReqInfo[]) {
 
   await productsQuantityUpdate(sales);
   
-  const salesWithId: Sale[][] = sales
-    .map(({ productId, quantity }: SaleInfo) => ( [saleId.insertId, productId, quantity]));
+  const salesWithId: number[][] = sales
+    .map(({ productId, quantity }: Sale) => ( [saleId, productId, quantity]));
   
   await salesService.create(salesWithId);
 
   const result = {
-    id: saleId.insertId,
+    id: saleId,
     itemsSold: salesRaw,
   }
   
@@ -84,16 +76,16 @@ async function createSale(salesRaw: SaleReqInfo[]) {
 }
 
 async function updateSale(saleId: number, salesRaw: SaleReqInfo[]) {
-  const sales: SaleInfo[] = await salesService.salesConverter(salesRaw);
-
-  await revertNewSaleProductUpdate(saleId);
+  const sales: Sale[] = await salesService.salesConverter(salesRaw);
 
   await salesChecker(sales);
 
+  await revertNewSaleProductUpdate(saleId);
+
   await productsQuantityUpdate(sales);
 
-  const salesWithId = sales
-    .map(({ productId, quantity }: SaleInfo) => ( [quantity, saleId, productId]));
+  const salesWithId: Sale[] = sales
+    .map(({ productId, quantity }: Sale) => ( { quantity, saleId, productId }));
 
   await salesService.update(salesWithId);
 

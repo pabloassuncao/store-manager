@@ -1,10 +1,8 @@
 import productsModel from "../models/productsModel";
 import { productSchema } from "../schemas/productSchema";
-import utils, { Product, ProductInfo } from "../controllers/utils";
+import utils, { Product } from "../controllers/utils";
 
-async function validateReqProduct({name, quantity}: ProductInfo) {
-  const prodInfo: ProductInfo = { name, quantity };
-  
+async function validateReqProduct(prodInfo: Product) {
   const {error} = await productSchema
     .validate(prodInfo);
   
@@ -14,16 +12,16 @@ async function validateReqProduct({name, quantity}: ProductInfo) {
   return;
 }
 
-async function create({name, quantity}: ProductInfo) {
-  const product: Product = await productsModel.findByName(name);
+async function create(prodInfo: Product) {
+  const product: Product = await productsModel.findByName(prodInfo.name);
 
   if(product) {
     throw { code: 'CONFLICT', message: utils.PRODUCT_NAME_ALREADY_EXISTS }
   }
 
-  const resultId = await productsModel.create({name, quantity});
+  const resultId: number = await productsModel.create(prodInfo);
 
-  return { id: resultId.insertId, name, quantity };
+  return { id: resultId, ...prodInfo };
 }
 
 async function listAll() {
@@ -31,7 +29,7 @@ async function listAll() {
   return products;
 }
 
-async function findById(id: number) {
+async function findById(id: Product['id']) {
   const product: Product = await productsModel.findById(id);
   
   if(!product) {
@@ -41,12 +39,12 @@ async function findById(id: number) {
   return product;
 }
 
-async function update({id, name, quantity}: Product) {
-  await findById(id);
+async function update(prodInfo: Product) {
+  await findById(prodInfo.id);
 
-  await productsModel.update({id, name, quantity});
+  await productsModel.update(prodInfo);
 
-  return {id, name, quantity};
+  return prodInfo;
 }
 
 async function deleteById(id: number) {
