@@ -8,6 +8,12 @@ export interface Product extends RowDataPacket {
   quantity: number;
 }
 
+export interface SaleRaw extends RowDataPacket {
+  date: Date;
+  "product_id": number;
+  quantity: number;
+}
+
 export interface Req extends ParamsDictionary {
   body: string;
 }

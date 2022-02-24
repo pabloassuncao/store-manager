@@ -1,5 +1,5 @@
 import connection from '../controllers/connection';
-import { Sale } from '../controllers/utils';
+import { Sale, SaleFindResponse, SaleRaw } from '../controllers/utils';
 import * as dotenv from 'dotenv';
 import { ResultSetHeader } from 'mysql2';
 dotenv.config({ path: __dirname+'/.env' });
@@ -16,7 +16,7 @@ async function create(sales: number[][]) {
   INSERT INTO sales_products (sale_id, product_id, quantity) VALUES ?`;
   const values = [sales];
   
-  await connection.query(sql, values);
+  await connection.query<ResultSetHeader>(sql, values);
   
   return;
 }
@@ -26,10 +26,9 @@ async function listAll() {
   SELECT sale_id as saleId, date, product_id, quantity FROM sales 
   inner join sales_products on sales.id = sales_products.sale_id`;
 
-  const [sales] = await connection.query(sql);
-  const result: any = sales
+  const [sales] = await connection.query<ResultSetHeader>(sql);
   
-  return result;
+  return sales;
 }
 
 async function findById(saleId: number) {
@@ -39,10 +38,9 @@ async function findById(saleId: number) {
   WHERE sale_id = ?`;
   const values = [saleId];
 
-  const [sale] = await connection.query(sql, values);
-  const result: any = sale
+  const [sale] = await connection.query<SaleRaw[]>(sql, values);
   
-  return result;
+  return sale;
 }
 
 async function update(salesToUpdate: number[]) {
@@ -50,9 +48,7 @@ async function update(salesToUpdate: number[]) {
   sales_products SET quantity = ? WHERE sale_id = ? AND product_id = ?`;
   const values = salesToUpdate;
   
-  const result = await connection.query(sql, values);
-
-  return;
+  await connection.query<ResultSetHeader>(sql, values);
 }
 
 async function deleteById(id: number) {
@@ -61,10 +57,8 @@ async function deleteById(id: number) {
 
   const values = [id];
 
-  await connection.query(sql1, values);
-  await connection.query(sql2, values);
-
-  return;
+  await connection.query<ResultSetHeader>(sql1, values);
+  await connection.query<ResultSetHeader>(sql2, values);
 }
 
 export default {

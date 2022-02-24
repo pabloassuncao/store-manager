@@ -17,9 +17,8 @@ async function listAll() {
   const sql = `SELECT * FROM products`;
 
   const [product] = await connection.query<ResultSetHeader>(sql);
-  const result: any = product
   
-  return result;
+  return product;
 }
 
 async function findByName(name: string) {
@@ -27,9 +26,8 @@ async function findByName(name: string) {
   const values = [name];
 
   const [product] = await connection.query<Product[]>(sql, values);
-  const result: any = product
   
-  return result[0];
+  return product[0];
 }
 
 async function findById(id: Product['id']) {
@@ -37,9 +35,8 @@ async function findById(id: Product['id']) {
   const values = [id];
 
   const [product] = await connection.query<Product[]>(sql, values);
-  const result: any = product
   
-  return result[0];
+  return product[0];
 }
 
 async function update({id, name, quantity}: Product) {
@@ -47,9 +44,8 @@ async function update({id, name, quantity}: Product) {
   const values = [name, quantity, id];
 
   const [product] = await connection.query<ResultSetHeader>(sql, values);
-  const result: any = product
 
-  return result;
+  return product;
 }
 
 async function deleteById(id: number) {
@@ -57,8 +53,6 @@ async function deleteById(id: number) {
   const values = [id];
 
   await connection.query<ResultSetHeader>(sql, values);
-
-  return;
 }
 
 export default {
